@@ -1,0 +1,27 @@
+h3{
+    color:deeppink;
+}
+
+.container{
+    color:lightsalmon;
+    border-style: dashed;
+    border-color: cadetblue;
+    border-radius: 10px;
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+.container-bg{
+    background-color: lightgoldenrodyellow;
+}
+
+.my-font{
+    font-family: "Geist Pixel", sans-serif;
+}
+
+#container-id{
+    color:darkslateblue;
+    margin-top: 100px;
+}
