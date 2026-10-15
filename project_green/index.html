@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BKK ParkWalk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/lab-154377/project_green/assets/index-CGHUo_Hz.js"></script>
+  <link rel="stylesheet" crossorigin href="/lab-154377/project_green/assets/index-B6BMtDqU.css">
+</head>
+
+<body>
+
+
+    <div class="app-container">
+        <!-- แถบเมนูด้านซ้าย (Sidebar) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2> BKK ParkWalk</h2>
+                <p id="selected-district-label" class="selected-district-label"
+                    aria-live="polite">
+                    คลิกแผนที่เพื่อเลือกเขต
+                </p>
+                <div class="location-controls">
+                    <button id="use-my-location"
+                        type="button"
+                        class="btn btn-light w-100">
+                         ใช้ตำแหน่งของฉัน
+                    </button>
+
+                    <p id="location-status"
+                        class="small mt-2 mb-2"
+                        role="status"
+                        aria-live="polite"></p>
+                </div>
+                <div
+                    class="filters"
+                    role="radiogroup"
+                    aria-label="เลือกเวลาเดินที่ต้องการ"
+                >
+                    <label class="time-filter">
+                        <input type="radio" name="minutes" value="5">
+                        <span>
+                            <strong>5 นาที</strong>
+                        </span>
+                    </label>
+
+                    <label class="time-filter">
+                        <input type="radio" name="minutes" value="10" checked>
+                        <span>
+                            <strong>10 นาที</strong>
+                        </span>
+                    </label>
+
+                    <label class="time-filter">
+                        <input type="radio" name="minutes" value="15">
+                        <span>
+                            <strong>15 นาที</strong>
+                        </span>
+                    </label>
+                </div>
+
+                <p class="small mt-2 mb-0 filter-helper-text">
+                    เลือกเวลาเดินที่ต้องการ ระบบค้นหาสวนในรัศมี 1,200 เมตร
+                    แล้วกรองด้วยเวลาเดินโดยประมาณตามเส้นทาง
+                </p>
+            </div>
+
+            <!-- กล่องแสดงผลรายการสวนสาธารณะ -->
+            <div class="sidebar-content">
+                <!-- 1. เพิ่มปุ่มกดเรียกดูสถิติไว้บนสุดของ Sidebar -->
+                <div class="p-3 border-bottom bg-light sticky-top">
+                    <button class="btn btn-outline-primary w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" 
+                            type="button" 
+                            data-bs-toggle="offcanvas" 
+                            data-bs-target="#statsPanel" 
+                            aria-controls="statsPanel">
+                         ดูสถิติสวนรายเขต (ย่อ/ขยาย)
+                    </button>
+                </div>
+
+            
+                <section id="walking-route-panel"
+                    class="walking-route-panel"
+                    aria-labelledby="walking-route-title"
+                    hidden>
+                    <h3 id="walking-route-title">เส้นทางเดิน</h3>
+                    <p id="walking-route-info" role="status" aria-live="polite"></p>
+                    <div class="d-flex gap-2 mb-2">
+                        <button id="start-navigation"
+                            type="button"
+                            class="btn btn-primary flex-fill"
+                            disabled>
+                            เริ่มนำทาง
+                        </button>
+
+                        <button id="stop-navigation"
+                            type="button"
+                            class="btn btn-outline-danger flex-fill"
+                            disabled>
+                            หยุดนำทาง
+                        </button>
+                    </div>
+                    <div class="mb-2">
+                        <button id="resume-navigation-follow"
+                            type="button"
+                            class="btn btn-outline-primary btn-sm w-100"
+                            hidden>
+                            กลับมาดูตำแหน่งปัจจุบัน
+                        </button>
+                    </div>
+                    <p id="navigation-status"
+                        class="small"
+                        role="status"
+                        aria-live="polite"></p>
+                    <div class="navigation-guidance">
+                        <p id="navigation-remaining"></p>
+                        <p id="navigation-next" aria-live="polite"></p>
+                        <details>
+                            <summary>ดูขั้นตอนเดินทั้งหมด</summary>
+                            <ol id="navigation-steps"></ol>
+                        </details>
+                    </div>
+                    <button id="clear-walking-route"
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary">
+                        ล้างเส้นทาง
+                    </button>
+                </section>
+
+                <p
+                    id="map-data-status"
+                    class="alert alert-warning m-3 small"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                ></p>
+
+                <div id="park-cards-list" class="result-list" role="status" aria-live="polite" aria-busy="false"></div>
+            </div>
+        </aside>
+
+        <!-- พื้นที่แสดงแผนที่ Leaflet -->
+        <main id="map"></main>
+    </div>
+
+<!-- 2. แถบสถิติรายเขต (Offcanvas) แบบย่อขยายได้ (อยู่ฝั่งขวา) -->
+    <div
+        class="offcanvas offcanvas-end shadow-lg"
+        data-bs-backdrop="false"
+        tabindex="-1"
+        id="statsPanel"
+        aria-labelledby="statsPanelLabel"
+    >
+       <div class="offcanvas-header text-white" style="background-color: #14532d;">
+            <h5 class="offcanvas-title fw-bold" id="statsPanelLabel"> สถิติสวนรายเขต</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body bg-light">
+            <section class="district-dashboard m-0 p-0 border-0 bg-transparent" aria-labelledby="statsPanelLabel">
+                <p id="district-overview" class="text-muted small mb-3" role="status">กำลังโหลดสถิติ...</p>
+
+                <div class="bg-white border rounded p-3 mb-3 shadow-sm">
+                    <h6 class="fw-bold text-success mb-2">ข้อมูลเขตที่เลือก</h6>
+                    <p id="district-detail" class="text-dark small mb-0" aria-live="polite">
+                        คลิกพื้นที่เขตบนแผนที่เพื่อดูสถิติ
+                    </p>
+                </div>
+
+                <div class="district-chart-scroll bg-white border rounded p-2 shadow-sm">
+                    <div id="district-chart"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</body>
+</html>
